@@ -7,7 +7,7 @@ class QuizItem {
   final String word;
   final String imagePath;
   final String translation;
-  final List<String> letters; // show these letters in container
+  final List<String> letters; // show these letters in quiz container
 
   QuizItem({
     required this.word,
@@ -25,7 +25,7 @@ class QuizScreen extends StatefulWidget {
 }
 
 class _QuizScreenState extends State<QuizScreen> {
-  // ✅ All quizzes in one list
+  //  All quizzes in one list
   final List<QuizItem> quizzes = [
     QuizItem(
       word: "BAG",
@@ -33,74 +33,138 @@ class _QuizScreenState extends State<QuizScreen> {
       translation: "බෑගය",
       letters: ["G", "A", "B"],
     ),
+
     QuizItem(
       word: "PENCIL",
       imagePath: "assets/images/pencil.png",
       translation: "පැන්සල",
       letters: ["C", "E", "L", "N", "I", "P"],
     ),
+
     QuizItem(
       word: "TEACHER",
       imagePath: "assets/images/teacher.png",
       translation: "ගුරුතුමිය",
-      letters: ["T", "E", "A", "C", "H", "R","E"],
+      letters: ["R", "E", "A", "H", "C", "T", "E"],
+    ),
+    QuizItem(
+      word: "CHAIR",
+      imagePath: "assets/images/chair.png",
+      translation: "පුටුව",
+      letters: ["I", "R","H", "A", "C"],
+    ),
+    QuizItem(
+      word: "TABLE",
+      imagePath: "assets/images/table.png",
+      translation: "මේසය",
+      letters: ["B", "A", "T", "L", "E"],
+    ),
+    QuizItem(
+      word: "CupBoard",
+      imagePath: "assets/images/cupboard.png",
+      translation: "අල්මාරිය",
+      letters: ["A", "U", "P", "O", "D", "C", "R", "B"],
+    ),
+    QuizItem(
+      word: "TOYS",
+      imagePath: "assets/images/toys.jpg",
+      translation: "සෙල්ලම් බඩු",
+      letters: ["Y","T", "O",  "S"],
+    ),
+    QuizItem(
+      word: "HOUSE",
+      imagePath: "assets/images/house.jpg",
+      translation: "ගෙදර",
+      letters: ["E", "U", "H", "O", "S"],
+    ),
+    QuizItem(
+      word: "CAR",
+      imagePath: "assets/images/car.avif",
+      translation: "කාර්",
+      letters: ["R", "A", "C"],
+    ),
+    QuizItem(
+      word: "STUDENT",
+      imagePath: "assets/images/student.webp",
+      translation: "ශිෂ්‍යයා",
+      letters: ["T", "E", "N", "D","T", "S", "U"],
     ),
   ];
 
-  int currentIndex = 0; // ✅ Track current quiz index
-  List<String> answer = [];
+  int currentIndex = 0; // Track current quiz index
+  late List<String?> answerSlots; // slots for each letter in the word
   String? wrongLetter;
-  Set<String> usedLetters = {};
+  Set<String> usedLetters = {}; // track used letters with index e.g. E0, E6
 
   QuizItem get currentQuiz => quizzes[currentIndex];
+  
 
-  void onLetterTap(String letter) {
-    int nextIndex = answer.length;
-
-    if (letter == currentQuiz.word[nextIndex]) {
-      setState(() {
-        answer.add(letter);
-        usedLetters.add(letter);
-        wrongLetter = null;
-      });
-
-      if (answer.join() == currentQuiz.word) {
-        showModalBottomSheet(
-          context: context,
-          isScrollControlled: true,
-          backgroundColor: Colors.transparent,
-          builder: (context) {
-            return CorrectPopup(
-              word: currentQuiz.word,
-              translation: currentQuiz.translation,
-              onNext: () {
-                Navigator.pop(context);
-                goToNextQuiz();
-              },
-            );
-          },
-        );
-      }
-    } else {
-      setState(() {
-        wrongLetter = letter;
-      });
-    }
+  @override
+  void initState() {
+    super.initState();
+    resetQuiz();
   }
+
+  void resetQuiz() {
+    answerSlots = List<String?>.filled(currentQuiz.word.length, null);
+    wrongLetter = null;
+    usedLetters.clear();
+  }
+
+  void onLetterTap(String letter, int index) {
+  final word = currentQuiz.word.toUpperCase();
+
+  // find the first empty slot (sequence order)
+  int nextIndex = answerSlots.indexWhere((e) => e == null);
+
+  if (nextIndex == -1) return; // if already full return
+//If letter matches the expected one at nextIndex → fill slot, mark button used, clear wrong flag.
+  if (word[nextIndex] == letter) {
+    setState(() {
+      answerSlots[nextIndex] = letter;
+      usedLetters.add(letter + index.toString()); 
+      wrongLetter = null;
+    });
+
+    // check if completed
+    if (answerSlots.join() == word) {
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: Colors.transparent,
+        builder: (context) {
+          return CorrectPopup(
+            word: currentQuiz.word,
+            translation: currentQuiz.translation,
+            onNext: () {
+              Navigator.pop(context);
+              goToNextQuiz();
+            },
+          );
+        },
+      );
+    }
+  } else {
+    //  wrong letter
+    setState(() {
+      wrongLetter = letter;
+    });
+  }
+}
+
+
 
   void goToNextQuiz() {
     if (currentIndex < quizzes.length - 1) {
       setState(() {
         currentIndex++;
-        answer = [];
-        wrongLetter = null;
-        usedLetters.clear();
+        resetQuiz();
       });
     } else {
-      // ✅ Finished all
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("All quizzes completed 🎉")));
+      // Finished all
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("All quizzes completed 🎉")),
+      );
     }
   }
 
@@ -115,7 +179,7 @@ class _QuizScreenState extends State<QuizScreen> {
           children: [
             SizedBox(height: screenHeight * 0.08),
 
-            // ✅ Progress text
+            // Progress text
             Align(
               alignment: Alignment.center,
               child: Text(
@@ -126,7 +190,7 @@ class _QuizScreenState extends State<QuizScreen> {
 
             SizedBox(height: screenHeight * 0.05),
 
-            // ✅ Image container
+            //  Image container
             Container(
               width: screenWidth * 0.65,
               height: screenHeight * 0.25,
@@ -153,11 +217,11 @@ class _QuizScreenState extends State<QuizScreen> {
             ),
 
             const SizedBox(height: 8),
-            AnswerBox(answer: answer),
+            AnswerBox(answer: answerSlots), //  show slots not list
 
             const SizedBox(height: 36),
 
-            // ✅ Quiz letters
+            //  Quiz letters
             Container(
               width: 332,
               height: 200,
@@ -170,18 +234,16 @@ class _QuizScreenState extends State<QuizScreen> {
                 child: Wrap(
                   alignment: WrapAlignment.center,
                   spacing: 6,
-                  runSpacing: 12, // space between rows
-                  children:
-                      currentQuiz.letters
-                          .map(
-                            (letter) => LetterButton(
-                              letter: letter,
-                              isWrong: wrongLetter == letter,
-                              isUsed: usedLetters.contains(letter),
-                              onTap: () => onLetterTap(letter),
-                            ),
-                          )
-                          .toList(),
+                  runSpacing: 12,
+                  children: List.generate(currentQuiz.letters.length, (i) {
+                    final letter = currentQuiz.letters[i];
+                    return LetterButton(
+                      letter: letter,
+                      isWrong: wrongLetter == letter,
+                      isUsed: usedLetters.contains(letter + i.toString()),
+                      onTap: () => onLetterTap(letter, i),
+                    );
+                  }),
                 ),
               ),
             ),
