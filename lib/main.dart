@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
       //home: const QuizScreen(),
       theme: AppTheme.lightTheme,
       routes: AppRoutes.routes,
-      initialRoute: AppRoutes.quiz,
+      initialRoute: AppRoutes.flashCard,
     );
   }
 }

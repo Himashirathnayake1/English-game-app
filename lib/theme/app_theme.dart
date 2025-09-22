@@ -4,7 +4,36 @@ class AppTheme {
   static ThemeData lightTheme = ThemeData(
     primarySwatch: Colors.blue,
     scaffoldBackgroundColor: const Color(0xFFF5F7FA),
+    appBarTheme: AppBarTheme(
+      backgroundColor: Colors.blue,
+      foregroundColor: Colors.white,
+      elevation: 0,
+      centerTitle: true,
+      titleTextStyle: const TextStyle(
+        fontFamily: 'Poppins',
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+        color: Colors.white,
+      ),
+    ),
     fontFamily: 'Poppins',
+    // Add elevated button theme
+    elevatedButtonTheme: ElevatedButtonThemeData(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.blue,
+        foregroundColor: Colors.white,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+        elevation: 2,
+        textStyle: const TextStyle(
+          fontFamily: 'Poppins',
+          fontSize: 16,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+    ),
     textTheme: const TextTheme(
       bodyMedium: TextStyle(
         fontSize: 14,
@@ -24,7 +53,6 @@ class AppTheme {
         fontWeight: FontWeight.w500,
         height: 1.0,
       ),
-
       headlineLarge: TextStyle(
         fontFamily: 'Inter',
         fontSize: 28.07,
