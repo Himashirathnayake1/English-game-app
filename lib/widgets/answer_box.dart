@@ -15,24 +15,25 @@ class AnswerBox extends StatelessWidget {
         border: Border.all(color: const Color(0xFFDFDFDF), width: 1),
         color: Colors.white,
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+      child: Wrap(
+        alignment: WrapAlignment.center,
         children: answer
             .map(
               (e) => Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                child: Text(
-                  e ?? "_", //  show "_" if empty
-                  style: const TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: Text(
+                    e ?? "_", //  show "_" if empty
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
                   ),
                 ),
-              ),
-            )
-            .toList(),
-      ),
-    );
+              )
+              .toList(),
+        ),
+      
+    );  
   }
 }
