@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flip_card/flip_card.dart';
+import 'package:flutter_tts/flutter_tts.dart';
+import 'package:learning_app/screens/results_page.dart';
 import 'package:learning_app/widgets/bottom_button.dart';
 
+import 'package:flutter_svg/flutter_svg.dart';
 class FlashCardScreen extends StatefulWidget {
   @override
   _FlashCardScreenState createState() => _FlashCardScreenState();
@@ -9,14 +12,130 @@ class FlashCardScreen extends StatefulWidget {
 
 class _FlashCardScreenState extends State<FlashCardScreen> {
   GlobalKey<FlipCardState> cardKey = GlobalKey<FlipCardState>();
+  final FlutterTts flutterTts = FlutterTts();
+
+  int currentIndex = 0;
+  bool wasFlipped = false;
+
+  final List<Map<String, String>> masteredList = [];
+  final List<Map<String, String>> toReviewList = [];
+
+  // Words list
+  final List<Map<String, String>> words = [
+    {"word": "Cat", "translation": "පූසා", "image": "assets/images/Cat.svg"},
+    {"word": "Dog", "translation": "බල්ලා", "image": "assets/images/Dog.svg"},
+    {
+      "word": "BlackBoard",
+      "translation": "කළු ලෑල්ල",
+      "image": "assets/images/Blackboard.svg",
+    },
+    {
+      "word": "Elephant",
+      "translation": "අලියා",
+      "image": "assets/images/Elephant.svg",
+    },
+    {
+      "word": "Eraser",
+      "translation": "මකනය",
+      "image": "assets/images/Eraser.svg",
+    },
+    {
+      "word": "Parrot",
+      "translation": "ගිරවා",
+      "image": "assets/images/parrot.svg",
+    },
+    {
+      "word": "Pencil",
+      "translation": "පැන්සල",
+      "image": "assets/images/Pencil.svg",
+    },
+    {
+      "word": "Rabbit",
+      "translation": "හාවා",
+      "image": "assets/images/Rabbit.svg",
+    },
+    {
+      "word": "Student",
+      "translation": "ශිෂ්‍යයා",
+      "image": "assets/images/Student.svg",
+    },
+    {
+      "word": "Teacher",
+      "translation": "ගුරුවරයා",
+      "image": "assets/images/Teacher.svg",
+    },
+  ];
+
+  Future<void> _speak(String word) async {
+    await flutterTts.setLanguage("en-US");
+    await flutterTts.setPitch(1.0);
+    await flutterTts.speak(word);
+  }
+
+  void _nextWord() {
+    final word = words[currentIndex];
+
+    if (wasFlipped) {
+      toReviewList.add(word);
+    } else {
+      masteredList.add(word);
+    }
+
+    if (currentIndex < words.length - 1) {
+      setState(() {
+        currentIndex++;
+        wasFlipped = false; //if the card show back side this will flip again to front
+      });
+      if (cardKey.currentState != null &&
+          cardKey.currentState!.isFront == false) {
+        cardKey.currentState?.toggleCard();
+      }
+    } else {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder:
+              (_) => ResultsPage(
+                masteredWords: masteredList,
+                toReviewWords: toReviewList,
+                onReviewAgain: () {
+                  // setState(() {
+                  //   currentIndex = 0;
+                  //   flipped = false;
+                  //   masteredList.clear();
+                  //   toReviewList.clear();
+                  // });
+
+                  // // Make sure the card is reset to front
+                  // if (cardKey.currentState != null &&
+                  //     cardKey.currentState!.isFront == false) {
+                  //   cardKey.currentState?.toggleCard();
+                  // }
+                },
+
+                onHome: () {
+                  // Go to home screen
+                  Navigator.popUntil(
+                    context,
+                    (route) => route is FlashCardScreen,
+                  );
+                },
+              ),
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    double progress = (currentIndex + 1) / words.length;
+    final word = words[currentIndex];
+
     return Scaffold(
       body: SafeArea(
         child: Column(
           children: [
-            // Top bar with close button and progress
+            // Top bar
             SizedBox(height: 20),
             Padding(
               padding: const EdgeInsets.symmetric(
@@ -33,7 +152,7 @@ class _FlashCardScreenState extends State<FlashCardScreen> {
                   ),
                   Expanded(
                     child: LinearProgressIndicator(
-                      value: 0.5, // update dynamically
+                      value: progress,
                       backgroundColor: Colors.grey[300],
                       color: Colors.blue,
                       minHeight: 6,
@@ -59,10 +178,20 @@ class _FlashCardScreenState extends State<FlashCardScreen> {
             Expanded(
               child: Center(
                 child: FlipCard(
+                  onFlip: () {
+                    // FlipCard does not tell us which side we are on, so we check manually
+                    if (cardKey.currentState != null &&
+                        cardKey.currentState!.isFront == false) {
+                      setState(() {
+                        wasFlipped = true; // mark as flipped when back is shown
+                      });
+                    }
+                  },
+
                   key: cardKey,
-                  flipOnTouch: true,
-                  front: buildFrontCard(),
-                  back: buildBackCard(),
+                  flipOnTouch: false,
+                  front: buildFrontCard(word),
+                  back: buildBackCard(word),
                 ),
               ),
             ),
@@ -72,8 +201,8 @@ class _FlashCardScreenState extends State<FlashCardScreen> {
     );
   }
 
-  // Front side
-  Widget buildFrontCard() {
+  // FRONT CARD
+  Widget buildFrontCard(Map<String, String> word) {
     return Column(
       children: [
         Container(
@@ -90,15 +219,15 @@ class _FlashCardScreenState extends State<FlashCardScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Image.asset(
-                  "assets/images/bag.png",
+                SvgPicture.asset(
+                  word["image"]!,
                   width: MediaQuery.of(context).size.width * 0.42,
                   height: MediaQuery.of(context).size.width * 0.42,
                   fit: BoxFit.contain,
                 ),
                 const SizedBox(height: 30),
                 Text(
-                  "බෑගය",
+                  word["translation"]!,
                   textAlign: TextAlign.center,
                   style: Theme.of(
                     context,
@@ -115,7 +244,6 @@ class _FlashCardScreenState extends State<FlashCardScreen> {
                       const SizedBox(height: 10),
                       Text(
                         "Tap to Study Again",
-                        textAlign: TextAlign.center,
                         style: Theme.of(context).textTheme.bodyLarge,
                       ),
                     ],
@@ -127,23 +255,17 @@ class _FlashCardScreenState extends State<FlashCardScreen> {
         ),
         SizedBox(height: 80),
 
-        // Bottom button
         GradientButton(
           text: "Yes, I know",
-          onPressed: () {
-            // your action
-          },
-          gradientColors: [
-            Colors.blue,
-            const Color.fromARGB(255, 10, 29, 201),
-          ], // optional custom gradient
+          onPressed: _nextWord,
+          gradientColors: [Colors.blue, const Color.fromARGB(255, 10, 29, 201)],
         ),
       ],
     );
   }
 
-  // Back side
-  Widget buildBackCard() {
+  // BACK CARD
+  Widget buildBackCard(Map<String, String> word) {
     return Column(
       children: [
         Container(
@@ -160,18 +282,28 @@ class _FlashCardScreenState extends State<FlashCardScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text("Bag", style: Theme.of(context).textTheme.bodyLarge),
+                Text(
+                  word["word"]!,
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodyLarge?.copyWith(fontSize: 24),
+                ),
                 const SizedBox(height: 20),
                 Text(
-                  "බෑගය",
+                  word["translation"]!,
                   textAlign: TextAlign.center,
                   style: Theme.of(
                     context,
                   ).textTheme.bodyMedium?.copyWith(fontSize: 18),
                 ),
                 const SizedBox(height: 32),
-                Icon(Icons.volume_up, size: 111, color: Colors.red),
-                  const SizedBox(height: 52),
+                IconButton(
+                  icon: Icon(Icons.volume_up, size: 50, color: Colors.red),
+                  onPressed: () {
+                    _speak(word["word"]!);
+                  },
+                ),
+                const SizedBox(height: 52),
                 GestureDetector(
                   onTap: () {
                     cardKey.currentState?.toggleCard();
@@ -182,7 +314,6 @@ class _FlashCardScreenState extends State<FlashCardScreen> {
                       const SizedBox(height: 10),
                       Text(
                         "Tap to Flip",
-                        textAlign: TextAlign.center,
                         style: Theme.of(context).textTheme.bodyLarge,
                       ),
                     ],
@@ -194,12 +325,9 @@ class _FlashCardScreenState extends State<FlashCardScreen> {
         ),
         SizedBox(height: 80),
 
-        // Bottom button
         GradientButton(
           text: "Next Word",
-          onPressed: () {
-            // your action
-          },
+          onPressed: _nextWord,
           gradientColors: [Colors.red, const Color.fromARGB(255, 117, 5, 5)],
         ),
       ],

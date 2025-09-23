@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:learning_app/screens/resuls_screen.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:learning_app/screens/results_page.dart';
 import 'package:learning_app/widgets/letter_button.dart';
-import 'package:learning_app/widgets/popup.dart';
+import 'package:learning_app/widgets/correct_popup.dart';
 import '../widgets/answer_box.dart';
 
 class QuizItem {
@@ -25,75 +26,75 @@ class QuizResult {
   QuizResult({required this.word, required this.isCorrect});
 }
 
-class QuizScreen extends StatefulWidget {
-  const QuizScreen({super.key});
+class LetterShuffleScreen extends StatefulWidget {
+  const LetterShuffleScreen({super.key});
 
   @override
-  State<QuizScreen> createState() => _QuizScreenState();
+  State<LetterShuffleScreen> createState() => _LetterShuffleScreenState();
 }
 
-class _QuizScreenState extends State<QuizScreen> {
+class _LetterShuffleScreenState extends State<LetterShuffleScreen> {
   //  All quizzes in one list
   final List<QuizItem> quizzes = [
     QuizItem(
-      word: "BAG",
-      imagePath: "assets/images/bag.png",
-      translation: "බෑගය",
-      letters: ["G", "A", "B"],
+      word: "Cat",
+      imagePath: "assets/images/Cat.svg",
+      translation: "පූසා",
+      letters: ["T", "A", "C"],
     ),
     QuizItem(
-      word: "PENCIL",
-      imagePath: "assets/images/pencil.png",
+      word: "Dog",
+      imagePath: "assets/images/Dog.svg",
+      translation: "බල්ලා",
+      letters: ["G", "O", "D"],
+    ),
+    QuizItem(
+      word: "BlackBoard",
+      imagePath: "assets/images/Blackboard.svg",
+      translation: "කළු ලෑල්ල",
+      letters: ["A", "R", "B", "O", "D", "B", "L", "C", "K", "A"],
+    ),
+    QuizItem(
+      word: "Elephant",
+      imagePath: "assets/images/Elephant.svg",
+      translation: "අලියා",
+      letters: ["H", "E", "N", "T", "P", "A", "L", "E"],
+    ),
+    QuizItem(
+      word: "Eraser",
+      imagePath: "assets/images/Eraser.svg",
+      translation: "මකනය",
+      letters: ["R","S", "A", "R", "E", "E"],
+    ),
+    QuizItem(
+      word: "Parrot",
+      imagePath: "assets/images/parrot.svg",
+      translation: "ගිරවා",
+      letters: ["R", "O", "T", "P", "A", "R"],
+    ),
+    QuizItem(
+      word: "Pencil",
+      imagePath: "assets/images/Pencil.svg",
       translation: "පැන්සල",
       letters: ["C", "E", "L", "N", "I", "P"],
     ),
     QuizItem(
-      word: "TEACHER",
-      imagePath: "assets/images/teacher.png",
-      translation: "ගුරුතුමිය",
-      letters: ["R", "E", "A", "H", "C", "T", "E"],
-    ),
-    QuizItem(
-      word: "CHAIR",
-      imagePath: "assets/images/chair.png",
-      translation: "පුටුව",
-      letters: ["I", "R", "H", "A", "C"],
-    ),
-    QuizItem(
-      word: "TABLE",
-      imagePath: "assets/images/table.png",
-      translation: "මේසය",
-      letters: ["B", "A", "T", "L", "E"],
-    ),
-    QuizItem(
-      word: "CupBoard",
-      imagePath: "assets/images/cupboard.png",
-      translation: "අල්මාරිය",
-      letters: ["A", "U", "P", "O", "D", "C", "R", "B"],
-    ),
-    QuizItem(
-      word: "TOYS",
-      imagePath: "assets/images/toys.jpg",
-      translation: "සෙල්ලම් බඩු",
-      letters: ["Y", "T", "O", "S"],
-    ),
-    QuizItem(
-      word: "HOUSE",
-      imagePath: "assets/images/house.jpg",
+      word: "Rabbit",
+      imagePath: "assets/images/Rabbit.svg",
       translation: "ගෙදර",
-      letters: ["E", "U", "H", "O", "S"],
+      letters: ["A", "R", "I", "B", "B",  "T"],
     ),
     QuizItem(
-      word: "CAR",
-      imagePath: "assets/images/car.avif",
-      translation: "කාර්",
-      letters: ["R", "A", "C"],
-    ),
-    QuizItem(
-      word: "STUDENT",
-      imagePath: "assets/images/student.webp",
+      word: "Student",
+      imagePath: "assets/images/Student.svg",
       translation: "ශිෂ්‍යයා",
-      letters: ["T", "E", "N", "D", "T", "S", "U"],
+      letters: ["D", "T", "U", "S", "N", "E", "T"],
+    ),
+    QuizItem(
+      word: "Teacher",
+      imagePath: "assets/images/Teacher.svg",
+      translation: "ගුරුවරයා",
+      letters: ["R", "A", "C", "H", "E", "T", "E"],
     ),
   ];
 
@@ -134,7 +135,7 @@ class _QuizScreenState extends State<QuizScreen> {
         wrongLetter = null;
       });
 
-      // ✅ word completed
+      //  word completed
       if (answerSlots.join() == word) {
         results.add(
           QuizResult(word: currentQuiz.word, isCorrect: !attemptedWrong),
@@ -172,11 +173,43 @@ class _QuizScreenState extends State<QuizScreen> {
         resetQuiz();
       });
     } else {
-      // Finished all quizzes → go to result screen
+      // Finished all quizzes → prepare data and go to results screen
+      List<Map<String, String>> masteredWords = [];
+      List<Map<String, String>> toReviewWords = [];
+
+      for (int i = 0; i < results.length; i++) {
+        final result = results[i];
+        final wordData = {
+          'word': result.word,
+          'translation': quizzes[i].translation,
+        };
+
+        if (result.isCorrect) {
+          masteredWords.add(wordData);
+        } else {
+          toReviewWords.add(wordData);
+        }
+      }
+
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (_) => ResultScreen(results: results),
+          builder:
+              (_) => ResultsPage(
+                masteredWords: masteredWords,
+                toReviewWords: toReviewWords,
+                onReviewAgain: () {
+                  // Restart the letter shuffle quiz with only the words that need review
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (_) => LetterShuffleScreen()),
+                  );
+                },
+                onHome: () {
+                  // Navigate back to home screen
+                  Navigator.of(context).popUntil((route) => route.isFirst);
+                },
+              ),
         ),
       );
     }
@@ -209,7 +242,7 @@ class _QuizScreenState extends State<QuizScreen> {
                 border: Border.all(color: const Color(0xFFDFDFDF), width: 1),
               ),
               child: Center(
-                child: Image.asset(
+                child: SvgPicture.asset(
                   currentQuiz.imagePath,
                   width: screenWidth * 0.42,
                   height: screenWidth * 0.42,
