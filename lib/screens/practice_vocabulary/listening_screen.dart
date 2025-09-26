@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
-import 'package:learning_app/screens/results_page.dart';
+import 'package:learning_app/screens/practice_vocabulary/results_page.dart';
 import 'package:learning_app/widgets/letter_button.dart';
 import 'package:learning_app/widgets/correct_popup.dart';
-import '../widgets/answer_box.dart';
+import '../../../widgets/answer_box.dart';
 
 class QuizResult {
   final String word;
@@ -244,12 +244,46 @@ class _ListeningQuizScreenState extends State<ListeningQuizScreen> {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
+    double progress = (currentIndex + 1) / widget.words.length;
 
     return Scaffold(
       body: SafeArea(
         child: Column(
           children: [
-            SizedBox(height: screenHeight * 0.08),
+            // Top bar with progress
+            SizedBox(height: 20),
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16.0,
+                vertical: 8,
+              ),
+              child: Row(
+                children: [
+                   Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(40),
+                      color: Colors.blue,
+                    ),
+                    child: IconButton(
+                      icon: Icon(Icons.close, color: Colors.white),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                    ),
+                  ),
+                  SizedBox(width: 20),
+                  Expanded(
+                    child: LinearProgressIndicator(
+                      value: progress,
+                      backgroundColor: Colors.grey[300],
+                      color: Colors.blue,
+                      minHeight: 6,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(height: screenHeight * 0.02),
             Align(
               alignment: Alignment.center,
               child: Text(

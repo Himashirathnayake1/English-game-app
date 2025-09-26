@@ -40,7 +40,7 @@ class OutOfStarsScreen extends StatelessWidget {
                       ),
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(10),
                       ),
                       child: Row(
                         children: [
@@ -53,7 +53,12 @@ class OutOfStarsScreen extends StatelessWidget {
                             ),
                           ),
                           SizedBox(width: 8),
-                          Icon(Icons.star, color: Colors.orange, size: 20),
+                          SvgPicture.asset(
+                                  'assets/icons/coin.svg',
+                                  width: 24,
+                                  height: 24,
+                                ),
+                        
                         ],
                       ),
                     ),
@@ -67,10 +72,13 @@ class OutOfStarsScreen extends StatelessWidget {
               Text(
                 "OUT OF STARS !",
                 style: TextStyle(
+                  fontFamily: 'Nunito',
                   fontSize: 36,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w800,
                   color: Colors.white,
-                  letterSpacing: 2.0,
+                  height: 19.2 / 36, // line-height converted to height
+                  letterSpacing: -0.24,
+                  // Note: "leading-trim: NONE" is not directly applicable in Flutter
                 ),
               ),
 
@@ -79,8 +87,13 @@ class OutOfStarsScreen extends StatelessWidget {
               // Subtitle
               Text(
                 "You've exhausted your ninja stars.",
+                textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: 18,
+                  fontFamily: 'Nunito',
+                  fontWeight: FontWeight.w500,
+                  fontSize: 14,
+                  height: 19.2 / 14, // line-height converted to height
+                  letterSpacing: -0.24,
                   color: Colors.white.withOpacity(0.9),
                 ),
               ),
@@ -89,21 +102,17 @@ class OutOfStarsScreen extends StatelessWidget {
 
               // Ninja character illustration
               Container(
-               
                 child: Stack(
                   alignment: Alignment.center,
                   children: [
                     // Ninja stars in background
-               
-                  
+
                     // Ninja character (using available icons as placeholder)
                     Container(
                       width: 169,
                       height: 277,
-                  
-                      child: SvgPicture.asset(
-                        'assets/images/Group 18029.svg',
-                      ),
+
+                      child: SvgPicture.asset('assets/images/Group 18029.svg'),
                     ),
                   ],
                 ),
@@ -112,31 +121,36 @@ class OutOfStarsScreen extends StatelessWidget {
               const SizedBox(height: 80),
 
               // Oops message
-              Text(
+                Text(
                 "Oops!",
+                textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Poppins',
+                  fontWeight: FontWeight.w500,
+                  fontSize: 14,
+                  height: 19.2 / 14, // line-height converted to height
+                  letterSpacing: -0.24,
                   color: Colors.white,
                 ),
-              ),
+                ),
 
-              const SizedBox(height: 12),
 
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 40.0),
                 child: Text(
                   "It looks like the coin vault is empty.\nWatch an ad to continue?",
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.white.withOpacity(0.9),
-                    height: 1.4,
-                  ),
+                   style: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontWeight: FontWeight.w500,
+                  fontSize: 14,
+                  height: 19.2 / 14, // line-height converted to height
+                  letterSpacing: -0.24,
+                  color: Colors.white,
+                ),
                 ),
               ),
-
-              const Spacer(),
+SizedBox(height: 42),
 
               // Action buttons
               Padding(
@@ -151,7 +165,7 @@ class OutOfStarsScreen extends StatelessWidget {
                         height: 60,
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius: BorderRadius.circular(30),
+                          borderRadius: BorderRadius.circular(15),
                           boxShadow: [
                             BoxShadow(
                               color: Colors.black.withOpacity(0.1),
@@ -171,7 +185,7 @@ class OutOfStarsScreen extends StatelessWidget {
                                 color: Color(0xFF4A90E2),
                               ),
                             ),
-                            const SizedBox(width: 12),
+                            const SizedBox(width: 18),
                             Text(
                               "1",
                               style: TextStyle(
@@ -180,8 +194,12 @@ class OutOfStarsScreen extends StatelessWidget {
                                 color: Colors.black,
                               ),
                             ),
-                            const SizedBox(width: 4),
-                            Icon(Icons.star, color: Colors.orange, size: 24),
+                          SizedBox(width: 8),
+                          SvgPicture.asset(
+                                  'assets/icons/coin.svg',
+                                  width: 24,
+                                  height: 24,
+                                ),
                           ],
                         ),
                       ),
@@ -197,7 +215,7 @@ class OutOfStarsScreen extends StatelessWidget {
                         height: 60,
                         decoration: BoxDecoration(
                           color: Colors.transparent,
-                          borderRadius: BorderRadius.circular(30),
+                          borderRadius: BorderRadius.circular(15),
                           border: Border.all(color: Colors.white, width: 2),
                         ),
                         child: Center(

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:learning_app/screens/listening_screen.dart';
+import 'package:learning_app/screens/practice_vocabulary/listening_screen.dart';
 
 class PracticeVocabularyPage extends StatefulWidget {
   @override

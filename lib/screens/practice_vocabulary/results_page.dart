@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:learning_app/widgets/bottom_button.dart';
 
-
 class ResultsPage extends StatelessWidget {
   final List<Map<String, String>> masteredWords;
   final List<Map<String, String>> toReviewWords;
@@ -196,12 +195,7 @@ class ResultsPage extends StatelessWidget {
                   padding: const EdgeInsets.all(30.0),
                   child: Column(
                     children: [
-                      GradientButton(
-                        text: "Review Again",
-                        onPressed: onHome,
-                        gradientColors: [],
-                      ),
-
+                      // Review Again Button
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.white,
@@ -218,6 +212,7 @@ class ResultsPage extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 20),
+                      // Home Button
                       GradientButton(
                         text: "Home",
                         onPressed: onHome,

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:learning_app/screens/results_page.dart';
+import 'package:learning_app/screens/practice_vocabulary/results_page.dart';
 import 'package:learning_app/widgets/correct_popup.dart';
 import 'package:learning_app/widgets/wrong_popup.dart';
+
 class QuizItem {
   final String word;
   final String imagePath;
@@ -154,7 +155,7 @@ class _QuizScreenState extends State<QuizScreen> {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) {
-         return WrongPopup(
+        return WrongPopup(
           word: currentQuiz.word,
           translation: currentQuiz.translation,
           onNext: () {

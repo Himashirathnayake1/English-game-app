@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flip_card/flip_card.dart';
 import 'package:flutter_tts/flutter_tts.dart';
-import 'package:learning_app/screens/results_page.dart';
+import 'package:learning_app/screens/practice_vocabulary/results_page.dart';
 import 'package:learning_app/widgets/bottom_button.dart';
-
 import 'package:flutter_svg/flutter_svg.dart';
+
 class FlashCardScreen extends StatefulWidget {
   @override
   _FlashCardScreenState createState() => _FlashCardScreenState();
@@ -84,7 +84,8 @@ class _FlashCardScreenState extends State<FlashCardScreen> {
     if (currentIndex < words.length - 1) {
       setState(() {
         currentIndex++;
-        wasFlipped = false; //if the card show back side this will flip again to front
+        wasFlipped =
+            false; //if the card show back side this will flip again to front
       });
       if (cardKey.currentState != null &&
           cardKey.currentState!.isFront == false) {
@@ -99,26 +100,16 @@ class _FlashCardScreenState extends State<FlashCardScreen> {
                 masteredWords: masteredList,
                 toReviewWords: toReviewList,
                 onReviewAgain: () {
-                  // setState(() {
-                  //   currentIndex = 0;
-                  //   flipped = false;
-                  //   masteredList.clear();
-                  //   toReviewList.clear();
-                  // });
-
-                  // // Make sure the card is reset to front
-                  // if (cardKey.currentState != null &&
-                  //     cardKey.currentState!.isFront == false) {
-                  //   cardKey.currentState?.toggleCard();
-                  // }
+                  // Restart the flash card session
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (_) => FlashCardScreen()),
+                  );
                 },
 
                 onHome: () {
-                  // Go to home screen
-                  Navigator.popUntil(
-                    context,
-                    (route) => route is FlashCardScreen,
-                  );
+                  // Navigate back to home screen (clear all and go to first route)
+                  Navigator.of(context).popUntil((route) => route.isFirst);
                 },
               ),
         ),
@@ -144,12 +135,19 @@ class _FlashCardScreenState extends State<FlashCardScreen> {
               ),
               child: Row(
                 children: [
-                  IconButton(
-                    icon: Icon(Icons.close, color: Colors.blue),
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(40),
+                      color: Colors.blue,
+                    ),
+                    child: IconButton(
+                      icon: Icon(Icons.close, color: Colors.white),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                    ),
                   ),
+                  SizedBox(width: 20),
                   Expanded(
                     child: LinearProgressIndicator(
                       value: progress,

@@ -20,7 +20,7 @@ class AnswerBox extends StatelessWidget {
         children: answer
             .map(
               (e) => Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 2.0),
                   child: Text(
                     e ?? "_", //  show "_" if empty
                     style: const TextStyle(

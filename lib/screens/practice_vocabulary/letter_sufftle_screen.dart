@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:learning_app/screens/results_page.dart';
+import 'package:learning_app/screens/practice_vocabulary/results_page.dart';
 import 'package:learning_app/widgets/letter_button.dart';
 import 'package:learning_app/widgets/correct_popup.dart';
-import '../widgets/answer_box.dart';
+import '../../../widgets/answer_box.dart';
 
 class QuizItem {
   final String word;
@@ -64,7 +64,7 @@ class _LetterShuffleScreenState extends State<LetterShuffleScreen> {
       word: "Eraser",
       imagePath: "assets/images/Eraser.svg",
       translation: "මකනය",
-      letters: ["R","S", "A", "R", "E", "E"],
+      letters: ["R", "S", "A", "R", "E", "E"],
     ),
     QuizItem(
       word: "Parrot",
@@ -82,7 +82,7 @@ class _LetterShuffleScreenState extends State<LetterShuffleScreen> {
       word: "Rabbit",
       imagePath: "assets/images/Rabbit.svg",
       translation: "ගෙදර",
-      letters: ["A", "R", "I", "B", "B",  "T"],
+      letters: ["A", "R", "I", "B", "B", "T"],
     ),
     QuizItem(
       word: "Student",
@@ -219,12 +219,46 @@ class _LetterShuffleScreenState extends State<LetterShuffleScreen> {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
+    double progress = (currentIndex + 1) / quizzes.length;
 
     return Scaffold(
       body: SafeArea(
         child: Column(
           children: [
-            SizedBox(height: screenHeight * 0.08),
+            // Top bar with progress
+            SizedBox(height: 20),
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16.0,
+                vertical: 8,
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(40),
+                      color: Colors.blue,
+                    ),
+                    child: IconButton(
+                      icon: Icon(Icons.close, color: Colors.white),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                    ),
+                  ),
+                  SizedBox(width: 20),
+                  Expanded(
+                    child: LinearProgressIndicator(
+                      value: progress,
+                      backgroundColor: Colors.grey[300],
+                      color: Colors.blue,
+                      minHeight: 6,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(height: screenHeight * 0.02),
             Align(
               alignment: Alignment.center,
               child: Text(

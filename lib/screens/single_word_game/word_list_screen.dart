@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:flutter_tts/flutter_tts.dart';
-import 'package:learning_app/screens/word_practice_screen.dart';
+import 'package:learning_app/screens/single_word_game/word_practice_screen.dart';
+import 'package:learning_app/screens/single_word_game/all_words_completed_screen.dart';
 import 'package:learning_app/widgets/word_practice_modal.dart';
 
 class WordListScreen extends StatefulWidget {
@@ -28,7 +30,7 @@ class _WordListScreenState extends State<WordListScreen> {
       "imagePath": "assets/images/Pencil.svg",
       "letters": ["N", "P", "C", "E", "I", "L"],
       "quizOptions": ["Pencil", "Eraser", "BlackBoard"],
-      "isCompleted": true,
+      "isCompleted": false,
     },
     {
       "word": "Teacher",
@@ -74,7 +76,7 @@ class _WordListScreenState extends State<WordListScreen> {
       "word": "BlackBoard",
       "translation": "පොත",
       "imagePath": "assets/images/Blackboard.svg",
-      "letters": ["A", "B", "L", "K", "O", "A", "R", "O", "A", "R", "D"],
+      "letters": ["A", "B", "L", "K", "O", "B", "C", "A", "R", "D"],
       "quizOptions": ["BlackBoard", "Notebook", "Magazine"],
       "isCompleted": false,
     },
@@ -91,7 +93,7 @@ class _WordListScreenState extends State<WordListScreen> {
       "word": "Parrot",
       "translation": "ගිරවා",
       "imagePath": "assets/images/parrot.svg",
-      "letters": ["A", "P", "O", "R", "O", "T"],
+      "letters": ["A", "P", "T", "R", "O", "R"],
       "quizOptions": ["Parrot", "Sparrow", "Pigeon"],
       "isCompleted": false,
     },
@@ -112,6 +114,33 @@ class _WordListScreenState extends State<WordListScreen> {
     await flutterTts.setLanguage("en-US");
     await flutterTts.setPitch(1.0);
     await flutterTts.speak(word);
+  }
+
+  void _checkAllWordsCompleted() {
+    // Check if all words are completed
+    bool allCompleted = words.every((word) => word['isCompleted'] == true);
+
+    if (allCompleted) {
+      // Calculate total coins (10 coins per word)
+      int totalCoins = words.length * 10;
+
+      // For now, use a placeholder time. You can implement actual time tracking later
+      String completionTime = "2:15";
+
+      // Show completion screen after a short delay
+      Future.delayed(Duration(seconds: 1), () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder:
+                (context) => AllWordsCompletedScreen(
+                  totalCoins: totalCoins,
+                  completionTime: completionTime,
+                ),
+          ),
+        );
+      });
+    }
   }
 
   Widget _getProgressIcon(bool isCompleted) {
@@ -164,7 +193,11 @@ class _WordListScreenState extends State<WordListScreen> {
                           setState(() {
                             wordData['isCompleted'] = true;
                           });
-                          Navigator.pop(context);
+
+                          // Check if all words are completed
+                          _checkAllWordsCompleted();
+
+                          // Don't call Navigator.pop here - let SingleWordPracticeFlow handle navigation
                         },
                       ),
                 ),
@@ -199,9 +232,13 @@ class _WordListScreenState extends State<WordListScreen> {
                   children: [
                     Row(
                       children: [
-                        GestureDetector(
+                        InkWell(
                           onTap: () => Navigator.pop(context),
-                          child: Icon(Icons.arrow_back, color: Colors.white),
+                          borderRadius: BorderRadius.circular(12),
+                          child: Padding(
+                            padding: EdgeInsets.all(8),
+                            child: Icon(Icons.arrow_back, color: Colors.white),
+                          ),
                         ),
                         SizedBox(width: 50),
                         Text(
@@ -233,7 +270,12 @@ class _WordListScreenState extends State<WordListScreen> {
                                 ),
                               ),
                               SizedBox(width: 4),
-                              Icon(Icons.star, color: Colors.orange, size: 20),
+                              SvgPicture.asset(
+                                'assets/icons/coin.svg',
+                                width: 20,
+                                height: 20,
+                                color: Colors.orange,
+                              ),
                             ],
                           ),
                         ),
@@ -253,8 +295,9 @@ class _WordListScreenState extends State<WordListScreen> {
                   final word = words[index];
                   return Padding(
                     padding: EdgeInsets.only(bottom: 16),
-                    child: GestureDetector(
+                    child: InkWell(
                       onTap: () => _showPracticeModal(word),
+                      borderRadius: BorderRadius.circular(16),
                       child: Container(
                         padding: EdgeInsets.all(20),
                         decoration: BoxDecoration(
@@ -271,8 +314,9 @@ class _WordListScreenState extends State<WordListScreen> {
                         child: Row(
                           children: [
                             // Speaker icon
-                            GestureDetector(
+                            InkWell(
                               onTap: () => _speak(word['word']),
+                              borderRadius: BorderRadius.circular(12),
                               child: Container(
                                 width: 44,
                                 height: 44,

@@ -16,8 +16,9 @@ class LetterButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return InkWell(
       onTap: isUsed ? null : onTap, // disable if used
+      borderRadius: BorderRadius.circular(12),
       child: Container(
         width: 53,
         height: 53,

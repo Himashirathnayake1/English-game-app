@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_tts/flutter_tts.dart';
-import 'package:learning_app/screens/single_word_practice_flow.dart';
+import 'package:learning_app/screens/single_word_game/single_word_practice_flow.dart';
 import 'package:learning_app/widgets/bottom_button.dart';
 
 class WordPracticeScreen extends StatefulWidget {

@@ -5,7 +5,7 @@ import 'package:learning_app/widgets/letter_button.dart';
 import 'package:learning_app/widgets/answer_box.dart';
 import 'package:learning_app/widgets/correct_popup.dart';
 import 'package:learning_app/widgets/wrong_popup.dart';
-import 'package:learning_app/screens/out_of_stars_screen.dart';
+import 'package:learning_app/screens/single_word_game/out_of_stars_screen.dart';
 
 enum PracticeMode { letterShuffle, listening, quiz }
 
@@ -60,8 +60,8 @@ class _SingleWordPracticeFlowState extends State<SingleWordPracticeFlow> {
     answerSlots = List<String?>.filled(currentWord.length, null);
     wrongLetter = null;
     usedLetters.clear();
+    // Use the pre-shuffled letters from word list instead of auto-shuffling
     shuffledLetters = List<String>.from(wordLetters);
-    shuffledLetters.shuffle();
     hasAnswered = false;
     selectedAnswer = null;
   }
@@ -99,6 +99,7 @@ class _SingleWordPracticeFlowState extends State<SingleWordPracticeFlow> {
   }
 
   void onQuizAnswerTap(String selectedAnswer) {
+    print("DEBUG: Quiz answer tapped: $selectedAnswer");
     if (hasAnswered || stars <= 0) return;
 
     setState(() {
@@ -107,6 +108,7 @@ class _SingleWordPracticeFlowState extends State<SingleWordPracticeFlow> {
     });
 
     bool isCorrect = selectedAnswer == widget.wordData['word'];
+    print("DEBUG: Answer is ${isCorrect ? 'correct' : 'wrong'}");
 
     if (isCorrect) {
       _showCorrectPopup();
@@ -124,6 +126,7 @@ class _SingleWordPracticeFlowState extends State<SingleWordPracticeFlow> {
   }
 
   void _showCorrectPopup() {
+    print("DEBUG: Showing correct popup");
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -133,7 +136,9 @@ class _SingleWordPracticeFlowState extends State<SingleWordPracticeFlow> {
           word: widget.wordData['word'],
           translation: widget.wordData['translation'],
           onNext: () {
+            print("DEBUG: Next button tapped in correct popup");
             Navigator.pop(context);
+            print("DEBUG: Popup closed, calling _moveToNextMode");
             _moveToNextMode();
           },
         );
@@ -199,8 +204,9 @@ class _SingleWordPracticeFlowState extends State<SingleWordPracticeFlow> {
       // Completed all modes - quiz is the final stage
       widget.onCompleted(); // This will mark the word as completed
 
-      // Navigate back to word list (pop all the way back)
-       Navigator.of(context).popUntil((route) => route.isFirst);
+      // Navigate back to word list after updating completion status
+
+      Navigator.of(context).popUntil((route) => route.isFirst);
     }
   }
 
@@ -210,10 +216,11 @@ class _SingleWordPracticeFlowState extends State<SingleWordPracticeFlow> {
       children: List.generate(3, (index) {
         return Padding(
           padding: EdgeInsets.symmetric(horizontal: 4),
-          child: Icon(
-            Icons.star,
+          child: SvgPicture.asset(
+            'assets/icons/life.svg',
             color: index < stars ? Colors.black : Colors.grey[300],
-            size: 22,
+            width: 22,
+            height: 22,
           ),
         );
       }),
@@ -253,7 +260,7 @@ class _SingleWordPracticeFlowState extends State<SingleWordPracticeFlow> {
           ),
         ),
         const SizedBox(height: 32),
-      
+
         const SizedBox(height: 8),
         AnswerBox(answer: answerSlots),
         const SizedBox(height: 36),
@@ -305,9 +312,15 @@ class _SingleWordPracticeFlowState extends State<SingleWordPracticeFlow> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                IconButton(
-                  icon: Icon(Icons.volume_up, size: 80, color: Colors.blue),
-                  onPressed: () => _speak(currentWord),
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.blue,
+                    shape: BoxShape.circle,
+                  ),
+                  child: IconButton(
+                    icon: Icon(Icons.volume_up, size: 80, color: Colors.white),
+                    onPressed: () => _speak(currentWord),
+                  ),
                 ),
                 const SizedBox(height: 10),
                 Text(
@@ -363,15 +376,6 @@ class _SingleWordPracticeFlowState extends State<SingleWordPracticeFlow> {
     return Column(
       children: [
         const SizedBox(height: 40),
-        Text(
-          "What does the picture mean?",
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: Color(0xFF2E3A59),
-          ),
-        ),
-        const SizedBox(height: 40),
         Container(
           width: screenWidth * 0.8,
           height: screenHeight * 0.3,
@@ -423,8 +427,9 @@ class _SingleWordPracticeFlowState extends State<SingleWordPracticeFlow> {
                 final option = quizOptions[index];
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 16),
-                  child: GestureDetector(
+                  child: InkWell(
                     onTap: () => onQuizAnswerTap(option),
+                    borderRadius: BorderRadius.circular(15),
                     child: Container(
                       width: double.infinity,
                       padding: const EdgeInsets.symmetric(
@@ -485,8 +490,9 @@ class _SingleWordPracticeFlowState extends State<SingleWordPracticeFlow> {
               padding: const EdgeInsets.all(16.0),
               child: Row(
                 children: [
-                  GestureDetector(
+                  InkWell(
                     onTap: () => Navigator.pop(context),
+                    borderRadius: BorderRadius.circular(20),
                     child: Container(
                       width: 40,
                       height: 40,

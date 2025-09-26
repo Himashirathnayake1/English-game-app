@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:learning_app/routes/app_route.dart';
+import 'package:learning_app/screens/single_word_game/all_words_completed_screen.dart';
 import 'package:learning_app/theme/app_theme.dart';
 
 void main() {
@@ -13,10 +14,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      //home: const QuizScreen(),
       theme: AppTheme.lightTheme,
       routes: AppRoutes.routes,
-      initialRoute: AppRoutes.wordList,
+      initialRoute: AppRoutes.wordList, // Changed to start with word list
     );
   }
 }
