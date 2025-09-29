@@ -236,7 +236,7 @@ class _WordListScreenState extends State<WordListScreen> {
         width: 30,
         height: 30,
         child: SvgPicture.asset(
-          'assets/icons/no_tasks_complete.svg',
+          'assets/icons/fail.svg',
           width: 30,
           height: 30,
         ),
