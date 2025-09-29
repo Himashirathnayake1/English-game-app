@@ -7,11 +7,13 @@ import 'package:learning_app/widgets/bottom_button.dart';
 class WordPracticeScreen extends StatefulWidget {
   final Map<String, dynamic> wordData;
   final VoidCallback onCompleted;
+  final VoidCallback? onFailed;
 
   const WordPracticeScreen({
     super.key,
     required this.wordData,
     required this.onCompleted,
+    this.onFailed,
   });
 
   @override
@@ -45,6 +47,7 @@ class _WordPracticeScreenState extends State<WordPracticeScreen> {
             (context) => SingleWordPracticeFlow(
               wordData: widget.wordData,
               onCompleted: widget.onCompleted,
+              onFailed: widget.onFailed,
             ),
       ),
     );
@@ -137,9 +140,10 @@ class _WordPracticeScreenState extends State<WordPracticeScreen> {
                   Text(
                     widget.wordData['word'],
                     textAlign: TextAlign.center,
-                    style: Theme.of(
-                      context,
-                    ).textTheme.bodyLarge?.copyWith(fontSize: 25, fontWeight: FontWeight.bold),
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      fontSize: 25,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
 
                   const SizedBox(height: 10),

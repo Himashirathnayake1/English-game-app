@@ -12,11 +12,13 @@ enum PracticeMode { letterShuffle, listening, quiz }
 class SingleWordPracticeFlow extends StatefulWidget {
   final Map<String, dynamic> wordData;
   final VoidCallback onCompleted;
+  final VoidCallback? onFailed;
 
   const SingleWordPracticeFlow({
     super.key,
     required this.wordData,
     required this.onCompleted,
+    this.onFailed,
   });
 
   @override
@@ -168,6 +170,11 @@ class _SingleWordPracticeFlowState extends State<SingleWordPracticeFlow> {
   }
 
   void _showGameOverDialog() {
+    // Call the onFailed callback if provided
+    if (widget.onFailed != null) {
+      widget.onFailed!();
+    }
+
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -190,6 +197,10 @@ class _SingleWordPracticeFlowState extends State<SingleWordPracticeFlow> {
   }
 
   void _moveToNextMode() {
+    // Call the onCompleted callback for each mode completion
+    // This will increment the task completion counter
+    widget.onCompleted();
+
     if (currentMode == PracticeMode.letterShuffle) {
       setState(() {
         currentMode = PracticeMode.listening;
@@ -201,12 +212,8 @@ class _SingleWordPracticeFlowState extends State<SingleWordPracticeFlow> {
         _initializeLetterShuffle();
       });
     } else {
-      // Completed all modes - quiz is the final stage
-      widget.onCompleted(); // This will mark the word as completed
-
-      // Navigate back to word list after updating completion status
-
-      Navigator.of(context).popUntil((route) => route.isFirst);
+      // No need to call onCompleted again as it was called at the start of this method
+      // The word list screen will handle showing completion screen and navigation
     }
   }
 

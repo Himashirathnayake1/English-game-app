@@ -4,11 +4,13 @@ import 'package:flutter_svg/svg.dart';
 class AllWordsCompletedScreen extends StatelessWidget {
   final int totalCoins;
   final String completionTime;
+  final VoidCallback? onFinished;
 
   const AllWordsCompletedScreen({
     super.key,
     required this.totalCoins,
     required this.completionTime,
+    this.onFinished,
   });
 
   @override
@@ -55,10 +57,10 @@ class AllWordsCompletedScreen extends StatelessWidget {
                           ),
                           SizedBox(width: 8),
                           SvgPicture.asset(
-                                  'assets/icons/coin.svg',
-                                  width: 24,
-                                  height: 24,
-                                ),
+                            'assets/icons/coin.svg',
+                            width: 24,
+                            height: 24,
+                          ),
                         ],
                       ),
                     ),
@@ -98,9 +100,9 @@ class AllWordsCompletedScreen extends StatelessWidget {
 
               SizedBox(height: 30),
 
-              // "100% Learned" title
+              // Word completed title
               Text(
-                "100% Learned",
+                "Word Learned!",
                 style: TextStyle(
                   color: Colors.white,
                   fontFamily: 'Poppins',
@@ -272,10 +274,13 @@ class AllWordsCompletedScreen extends StatelessWidget {
                           shadowColor: Colors.black.withOpacity(0.1),
                         ),
                         onPressed: () {
-                          // Handle finished action
-                          Navigator.of(
-                            context,
-                          ).popUntil((route) => route.isFirst);
+                          // Just call the callback which will handle navigation
+                          if (onFinished != null) {
+                            onFinished!();
+                          } else {
+                            // Fallback if no callback provided
+                            Navigator.of(context).popUntil((route) => route.isFirst);
+                          }
                         },
                         child: Text(
                           "FINISHED",
@@ -290,7 +295,8 @@ class AllWordsCompletedScreen extends StatelessWidget {
                     SizedBox(height: 20),
                     // HOME button
                     SizedBox(
-                      width: double.infinity,  height: 60,
+                      width: double.infinity,
+                      height: 60,
                       child: OutlinedButton(
                         style: OutlinedButton.styleFrom(
                           foregroundColor: Colors.white,
@@ -301,16 +307,20 @@ class AllWordsCompletedScreen extends StatelessWidget {
                           ),
                         ),
                         onPressed: () {
-                          // Navigate to home
-                          Navigator.of(
-                            context,
-                          ).popUntil((route) => route.isFirst);
+                          // Just call the callback which will handle navigation
+                          if (onFinished != null) {
+                            onFinished!();
+                          } else {
+                            // Fallback if no callback provided
+                            Navigator.of(context).popUntil((route) => route.isFirst);
+                          }
                         },
                         child: Text(
                           "HOME",
                           style: TextStyle(
                             fontSize: 18,
-                            fontWeight: FontWeight.bold,color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
                           ),
                         ),
                       ),

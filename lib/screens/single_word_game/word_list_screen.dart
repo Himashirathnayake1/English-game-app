@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter_tts/flutter_tts.dart';
-import 'package:learning_app/screens/single_word_game/word_practice_screen.dart';
+import 'dart:async';
+import 'package:learning_app/screens/single_word_game/word_review_screen.dart';
 import 'package:learning_app/screens/single_word_game/all_words_completed_screen.dart';
 import 'package:learning_app/widgets/word_practice_modal.dart';
 
@@ -14,6 +15,8 @@ class WordListScreen extends StatefulWidget {
 
 class _WordListScreenState extends State<WordListScreen> {
   final FlutterTts flutterTts = FlutterTts();
+  final Stopwatch _stopwatch = Stopwatch();
+  Timer? _timer;
 
   final List<Map<String, dynamic>> words = [
     {
@@ -23,6 +26,8 @@ class _WordListScreenState extends State<WordListScreen> {
       "letters": ["B", "R", "I", "A", "T", "B"],
       "quizOptions": ["Rabbit", "Cat", "Dog"],
       "isCompleted": false,
+      "tasksCompleted": 0, // Track number of tasks completed (0-3)
+      "failed": false, // Track if user failed and had to start over
     },
     {
       "word": "Pencil",
@@ -31,6 +36,8 @@ class _WordListScreenState extends State<WordListScreen> {
       "letters": ["N", "P", "C", "E", "I", "L"],
       "quizOptions": ["Pencil", "Eraser", "BlackBoard"],
       "isCompleted": false,
+      "tasksCompleted": 0,
+      "failed": false,
     },
     {
       "word": "Teacher",
@@ -39,6 +46,8 @@ class _WordListScreenState extends State<WordListScreen> {
       "letters": ["E", "T", "C", "A", "H", "E", "R"],
       "quizOptions": ["Student", "Teacher", "BlackBoard"],
       "isCompleted": false,
+      "tasksCompleted": 0,
+      "failed": false,
     },
     {
       "word": "Cat",
@@ -47,6 +56,8 @@ class _WordListScreenState extends State<WordListScreen> {
       "letters": ["C", "T", "A"],
       "quizOptions": ["Dog", "Cat", "Elephant"],
       "isCompleted": false,
+      "tasksCompleted": 0,
+      "failed": false,
     },
     {
       "word": "Dog",
@@ -55,6 +66,8 @@ class _WordListScreenState extends State<WordListScreen> {
       "letters": ["O", "D", "G"],
       "quizOptions": ["Cat", "Dog", "Rabbit"],
       "isCompleted": false,
+      "tasksCompleted": 0,
+      "failed": false,
     },
     {
       "word": "Elephant",
@@ -63,6 +76,8 @@ class _WordListScreenState extends State<WordListScreen> {
       "letters": ["P", "L", "E", "E", "H", "N", "A", "T"],
       "quizOptions": ["Lion", "Elephant", "Tiger"],
       "isCompleted": false,
+      "tasksCompleted": 0,
+      "failed": false,
     },
     {
       "word": "Eraser",
@@ -71,6 +86,8 @@ class _WordListScreenState extends State<WordListScreen> {
       "letters": ["R", "A", "E", "S", "E", "R"],
       "quizOptions": ["Eraser", "Apple", "Banana"],
       "isCompleted": false,
+      "tasksCompleted": 0,
+      "failed": false,
     },
     {
       "word": "BlackBoard",
@@ -79,6 +96,8 @@ class _WordListScreenState extends State<WordListScreen> {
       "letters": ["A", "B", "L", "K", "O", "B", "C", "A", "R", "D"],
       "quizOptions": ["BlackBoard", "Notebook", "Magazine"],
       "isCompleted": false,
+      "tasksCompleted": 0,
+      "failed": false,
     },
 
     {
@@ -88,6 +107,8 @@ class _WordListScreenState extends State<WordListScreen> {
       "letters": ["T", "S", "D", "U", "N", "E", "T"],
       "quizOptions": ["Teacher", "Student", "Office"],
       "isCompleted": false,
+      "tasksCompleted": 0,
+      "failed": false,
     },
     {
       "word": "Parrot",
@@ -96,6 +117,8 @@ class _WordListScreenState extends State<WordListScreen> {
       "letters": ["A", "P", "T", "R", "O", "R"],
       "quizOptions": ["Parrot", "Sparrow", "Pigeon"],
       "isCompleted": false,
+      "tasksCompleted": 0,
+      "failed": false,
     },
   ];
 
@@ -116,57 +139,106 @@ class _WordListScreenState extends State<WordListScreen> {
     await flutterTts.speak(word);
   }
 
-  void _checkAllWordsCompleted() {
-    // Check if all words are completed
-    bool allCompleted = words.every((word) => word['isCompleted'] == true);
+  // This function has been replaced by individual word completion tracking
 
-    if (allCompleted) {
-      // Calculate total coins (10 coins per word)
-      int totalCoins = words.length * 10;
+  void _showWordCompletedScreen() {
+    // Calculate coins for this single word (10 coins per word)
+    int coinsEarned = 10;
 
-      // For now, use a placeholder time. You can implement actual time tracking later
-      String completionTime = "2:15";
+    // Get the actual completion time
+    String completionTime = _stopTimerAndGetFormattedTime();
 
-      // Show completion screen after a short delay
-      Future.delayed(Duration(seconds: 1), () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder:
-                (context) => AllWordsCompletedScreen(
-                  totalCoins: totalCoins,
-                  completionTime: completionTime,
-                ),
-          ),
-        );
-      });
-    }
+    // Show completion screen after a short delay
+    Future.delayed(Duration(seconds: 1), () {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder:
+              (context) => AllWordsCompletedScreen(
+                totalCoins: coinsEarned,
+                completionTime: completionTime,
+                onFinished: () {
+                  // Navigate back to word list screen
+                  // This will be called when user presses FINISHED or HOME
+                  Navigator.of(context).popUntil((route) => route.isFirst);
+                },
+              ),
+        ),
+      );
+    });
   }
 
-  Widget _getProgressIcon(bool isCompleted) {
-    if (isCompleted) {
-      return Container(
-        width: 24,
-        height: 24,
-        decoration: BoxDecoration(color: Colors.green, shape: BoxShape.circle),
-        child: Icon(Icons.check, color: Colors.white, size: 16),
-      );
-    } else {
-      return Container(
-        width: 24,
-        height: 24,
-        decoration: BoxDecoration(
-          color: Colors.grey[300],
-          shape: BoxShape.circle,
+  Widget _getProgressIcon(Map<String, dynamic> word) {
+    // If all tasks completed (word is complete)
+    if (word['isCompleted']) {
+      return SizedBox(
+        width: 30,
+        height: 30,
+        child: SvgPicture.asset(
+          'assets/icons/all_tasks_complete.svg',
+          width: 30,
+          height: 30,
         ),
-        child: Container(
-          width: 12,
-          height: 12,
-          margin: EdgeInsets.all(6),
-          decoration: BoxDecoration(
-            color: Colors.grey[500],
-            shape: BoxShape.circle,
-          ),
+      );
+    }
+    // Always show progress based on tasks completed, even if failed
+    else if (word['tasksCompleted'] > 0) {
+      // Show icon based on number of completed tasks
+      switch (word['tasksCompleted']) {
+        case 1:
+          return SizedBox(
+            width: 30,
+            height: 30,
+            child: SvgPicture.asset(
+              'assets/icons/1_task_complete.svg',
+              width: 30,
+              height: 30,
+            ),
+          );
+        case 2:
+          return SizedBox(
+            width: 30,
+            height: 30,
+            child: SvgPicture.asset(
+              'assets/icons/2_task_complete.svg',
+              width: 30,
+              height: 30,
+            ),
+          );
+        default:
+          return SizedBox(
+            width: 30,
+            height: 30,
+            child: SvgPicture.asset(
+              'assets/icons/fail.svg',
+              width: 30,
+              height: 30,
+            ),
+          );
+      }
+    }
+    // Only show failed icon if no tasks completed and failed flag is true
+    else if (word['failed']) {
+      return SizedBox(
+        width: 30,
+        height: 30,
+        child: SvgPicture.asset(
+          'assets/icons/fail.svg',
+          width: 30,
+          height: 30,
+        ),
+      );
+    }
+    // Default case: no tasks completed and not failed
+    else {
+      // No tasks completed yet
+      return SizedBox(
+        width: 30,
+        height: 30,
+        child: SvgPicture.asset(
+          'assets/icons/no_tasks_complete.svg',
+          width: 30,
+          height: 30,
         ),
       );
     }
@@ -182,6 +254,10 @@ class _WordListScreenState extends State<WordListScreen> {
             wordData: wordData,
             onPracticePressed: () {
               Navigator.pop(context); // Close the modal
+
+              // Start the timer when practice begins
+              _startTimer();
+
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -191,13 +267,28 @@ class _WordListScreenState extends State<WordListScreen> {
                         onCompleted: () {
                           // Update completion status
                           setState(() {
-                            wordData['isCompleted'] = true;
+                            // Increment tasks completed
+                            wordData['tasksCompleted'] =
+                                (wordData['tasksCompleted'] as int) + 1;
+
+                            // If all 3 tasks are completed, mark the word as complete
+                            if (wordData['tasksCompleted'] == 3) {
+                              wordData['isCompleted'] = true;
+
+                              // Show completion screen only when all 3 tasks are done
+                              _showWordCompletedScreen();
+                            }
                           });
 
-                          // Check if all words are completed
-                          _checkAllWordsCompleted();
-
-                          // Don't call Navigator.pop here - let SingleWordPracticeFlow handle navigation
+                          // No need to navigate here - the completion screen will handle that
+                        },
+                        onFailed: () {
+                          // Update failed status if user runs out of stars
+                          // But preserve the tasks completed count
+                          setState(() {
+                            wordData['failed'] = true;
+                            // We don't reset tasksCompleted anymore
+                          });
                         },
                       ),
                 ),
@@ -210,6 +301,7 @@ class _WordListScreenState extends State<WordListScreen> {
   @override
   Widget build(BuildContext context) {
     int completedWords = words.where((word) => word['isCompleted']).length;
+    int totalCoins = completedWords * 10; // 10 coins per completed word
 
     return Scaffold(
       body: SafeArea(
@@ -262,7 +354,7 @@ class _WordListScreenState extends State<WordListScreen> {
                           child: Row(
                             children: [
                               Text(
-                                completedWords.toString(),
+                                totalCoins.toString(),
                                 style: TextStyle(
                                   color: Colors.black,
                                   fontSize: 18,
@@ -320,10 +412,6 @@ class _WordListScreenState extends State<WordListScreen> {
                               child: Container(
                                 width: 44,
                                 height: 44,
-                                decoration: BoxDecoration(
-                                  color: Colors.blue.withOpacity(0.1),
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
                                 child: Icon(
                                   Icons.volume_up,
                                   color: Color.fromRGBO(41, 55, 72, 1),
@@ -359,7 +447,7 @@ class _WordListScreenState extends State<WordListScreen> {
                             ),
 
                             // Progress indicator
-                            _getProgressIcon(word['isCompleted']),
+                            _getProgressIcon(word),
                           ],
                         ),
                       ),
@@ -374,8 +462,23 @@ class _WordListScreenState extends State<WordListScreen> {
     );
   }
 
+  // Start the stopwatch for timing word practice
+  void _startTimer() {
+    _stopwatch.reset();
+    _stopwatch.start();
+  }
+
+  // Stop the stopwatch and format the elapsed time
+  String _stopTimerAndGetFormattedTime() {
+    _stopwatch.stop();
+    final int minutes = _stopwatch.elapsed.inMinutes;
+    final int seconds = _stopwatch.elapsed.inSeconds % 60;
+    return "$minutes:${seconds.toString().padLeft(2, '0')}";
+  }
+
   @override
   void dispose() {
+    _timer?.cancel();
     flutterTts.stop();
     super.dispose();
   }
